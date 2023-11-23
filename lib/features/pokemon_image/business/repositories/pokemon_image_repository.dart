@@ -4,8 +4,8 @@ import '../../../../../core/params/params.dart';
 import '../entities/pokemon_image_entity.dart';
 
 
-abstract class TemplateRepository {
-  Future<Either<Failure, PokemonImageEntity>> getTemplate({
-    required TemplateParams templateParams,
+abstract class PokemonImageRepository {
+  Future<Either<Failure, PokemonImageEntity>> getPokemonImage({
+    required PokemonImageParams pokemonImageParams,
   });
 }

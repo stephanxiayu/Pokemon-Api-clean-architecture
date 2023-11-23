@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:pokemon_clean_architecture/core/constants/constants.dart';
 import '../../../../../core/errors/exceptions.dart';
 import '../../../../../core/params/params.dart';
-import '../models/template_model.dart';
+import '../models/pokemon_image_model.dart';
+import 'package:path_provider/path_provider.dart';
 
 abstract class PokemonImageRemoteDataSource {
-  Future<PokemonImageModel> getTemplate({required PokemonImageParams pokemonImageParams});
+  Future<PokemonImageModel> getPokemonImage(
+      {required PokemonImageParams pokemonImageParams});
 }
 
 class PokemonImageRemoteDataSourceImpl implements PokemonImageRemoteDataSource {
@@ -13,16 +18,16 @@ class PokemonImageRemoteDataSourceImpl implements PokemonImageRemoteDataSource {
   PokemonImageRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<PokemonImageModel> getPokemonImage({required PokemonImageParams pokemonImageParams}) async {
-    final response = await dio.get(
-      'https://pokeapi.co/api/v2/pokemon/',
-      queryParameters: {
-        'api_key': 'if needed',
-      },
-    );
+  Future<PokemonImageModel> getPokemonImage(
+      {required PokemonImageParams pokemonImageParams}) async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    directory.deleteSync(recursive: true);
+    final String pathFile = '${directory.path}/${pokemonImageParams.name}.png}';
+
+    final response = await dio.download(pokemonImageParams.imageUrl, pathFile);
 
     if (response.statusCode == 200) {
-      return PokemonImageModel.fromJson(json: response.data);
+      return PokemonImageModel.fromJson(json: {kPath:pathFile});
     } else {
       throw ServerException();
     }

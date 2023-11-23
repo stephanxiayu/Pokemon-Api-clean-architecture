@@ -1,43 +1,42 @@
 import 'package:dartz/dartz.dart';
-
 import '../../../../../core/connection/network_info.dart';
 import '../../../../../core/errors/exceptions.dart';
 import '../../../../../core/errors/failure.dart';
 import '../../../../../core/params/params.dart';
-import '../../business/repositories/template_repository.dart';
-import '../datasources/template_local_data_source.dart';
-import '../datasources/template_remote_data_source.dart';
-import '../models/template_model.dart';
+import '../../business/repositories/pokemon_image_repository.dart';
+import '../datasources/pokemon_image_local_data_source.dart';
+import '../datasources/pokemon_image_remote_data_source.dart';
+import '../models/pokemon_image_model.dart';
 
-class TemplateRepositoryImpl implements TemplateRepository {
-  final TemplateRemoteDataSource remoteDataSource;
-  final TemplateLocalDataSource localDataSource;
+class PokemonImageRepositoryImpl implements PokemonImageRepository {
+  final PokemonImageRemoteDataSource pokemonImageRemoteDataSource;
+  final PokemonImageLocalDataSource pokemonImageLocalDataSource;
   final NetworkInfo networkInfo;
 
-  TemplateRepositoryImpl({
-    required this.remoteDataSource,
-    required this.localDataSource,
+  PokemonImageRepositoryImpl({
+    required this.pokemonImageRemoteDataSource,
+    required this.pokemonImageLocalDataSource,
     required this.networkInfo,
   });
 
   @override
-  Future<Either<Failure, TemplateModel>> getTemplate(
-      {required TemplateParams templateParams}) async {
+  Future<Either<Failure, PokemonImageModel>> getPokemonImage(
+      {required PokemonImageParams pokemonImageParams}) async {
     if (await networkInfo.isConnected!) {
       try {
-        TemplateModel remoteTemplate =
-            await remoteDataSource.getTemplate(templateParams: templateParams);
+        PokemonImageModel remotePokemonImage =
+            await pokemonImageRemoteDataSource.getPokemonImage(pokemonImageParams: pokemonImageParams);
 
-        localDataSource.cacheTemplate(templateToCache: remoteTemplate);
+        pokemonImageLocalDataSource.cachePokemonImage(pokemonImageToCache: remotePokemonImage);
 
-        return Right(remoteTemplate);
+        return Right(remotePokemonImage);
       } on ServerException {
         return Left(ServerFailure(errorMessage: 'This is a server exception'));
       }
     } else {
       try {
-        TemplateModel localTemplate = await localDataSource.getLastTemplate();
-        return Right(localTemplate);
+        PokemonImageModel localPokemonImage = await pokemonImageLocalDataSource.getLastPokemonImage();
+        return Right(localPokemonImage);
       } on CacheException {
         return Left(CacheFailure(errorMessage: 'This is a cache exception'));
       }

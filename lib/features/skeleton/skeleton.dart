@@ -19,7 +19,7 @@ class Skeleton extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Poke-Mapp'),
+        title: const Text('Poke API'),
       ),
       body: pages[selectedPage],
       bottomNavigationBar: const CustomBottomBarWidget(),
